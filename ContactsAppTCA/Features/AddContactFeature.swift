@@ -9,9 +9,9 @@ import ComposableArchitecture
 import SwiftUI
 
 @Reducer
-struct AddContactsFeature {
+struct AddContactFeature {
     @ObservableState
-    struct State {
+    struct State: Equatable {
         var contact: Contact
     }
     enum Action {
@@ -34,18 +34,36 @@ struct AddContactsFeature {
     }
 }
 
-struct AddContactsFeatureView: View {
-    @Bindable var store: StoreOf<AddContactsFeature>
+struct AddContactView: View {
+    @Bindable var store: StoreOf<AddContactFeature>
 
     var body: some View {
         Form {
             TextField("Name", text: $store.contact.name.sending(\.setName))
+            Button("Save") {
+                store.send(.saveButtonTapped)
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") {
+                    store.send(.cancelButtonTappped)
+                }
+            }
         }
     }
 }
 
 #Preview {
-    AddContactsFeatureView(store: Store(initialState: AddContactsFeature.State(contact: Contact(id: UUID(), name: "Pat"))) {
-        AddContactsFeature()
-    })
+    NavigationStack {
+        AddContactView(
+            store: Store(
+                initialState: AddContactFeature.State(
+                    contact: Contact(id: UUID(), name: "Pat")
+                )
+            ) {
+                AddContactFeature()
+            }
+        )
+    }
 }
